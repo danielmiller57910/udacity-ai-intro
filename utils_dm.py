@@ -1,6 +1,5 @@
-from string import ascii_letters
 import pdb
-import math
+from string import ascii_letters
 
 def grid_values(grid: str) -> dict:
     sudoku_board_dictionary = {}
@@ -62,13 +61,14 @@ class BoardSet:
 
         row_start_pos, col_start_pos = self.ROW_START_DICT[row_pos], self.COL_START_DICT[int(col_pos)]
         grid_list = []
-        
         for i in range(row_start_pos, row_start_pos + 3):
-            row = chr(ord('@')+i) 
             for j in range(col_start_pos, col_start_pos + 3):
-               grid_list.extend(f'{row}{j}')
-
+                current = chr(ord('@')+i) + str(j)
+                grid_list.append(current)
         return grid_list 
+
+
+
         
 
 
