@@ -16,17 +16,16 @@ class TestDMUtils(unittest.TestCase):
         self.assertEqual(grid_board['A3'], '3') 
         self.assertEqual(grid_board['I9'], '.')
     
-    # def test_build_row_col_set(self):
-    #     board_set = utils_dm.BoardSet('A5')
-    #     board_set.build_set()
-    #     self.assertEqual(board_set.row_set[1], 'A2')
-    #     self.assertEqual(board_set.row_set[-1], 'A9')
-    #     self.assertEqual(board_set.col_set[0], 'A5')
-    #     self.assertEqual(board_set.col_set[-1], 'I5')
+    def test_build_row_col_set(self):
+        board_set = utils_dm.BoardSet('A5')
+        board_set.build_set()
+        self.assertEqual(board_set.row_set[1], 'A2')
+        self.assertEqual(board_set.row_set[-1], 'A9')
+        self.assertEqual(board_set.col_set[0], 'A5')
+        self.assertEqual(board_set.col_set[-1], 'I5')
 
     def test_build_grid_set(self):
         board_set = utils_dm.BoardSet('I9')
         board_set.build_set()
-        print(board_set.row_set)
-        print(board_set.col_set)
-        print(board_set.grid_set)
+        self.assertEqual(board_set.grid_set[0], 'G7') 
+        self.assertEqual(board_set.grid_set[-1], 'I9') 
