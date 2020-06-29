@@ -1,6 +1,7 @@
 import pdb
 from string import ascii_letters
 from board_set import AssociatedNodes
+from empty_node import EmptyNode
 
 def grid_values(grid: str) -> dict:
     sudoku_board_dictionary = {}
@@ -12,6 +13,12 @@ def grid_values(grid: str) -> dict:
            grid_index +=1
     
     empty_indexes = empty_grid_indexes(sudoku_board_dictionary)
+    empty_node = EmptyNode(
+        empty_indexes[0],
+        get_unique_board_set(AssociatedNodes(empty_indexes[0])), 
+        sudoku_board_dictionary
+    )
+    empty_node.identify_filled_values()
     return sudoku_board_dictionary
 
 def create_grid_columns():
@@ -22,3 +29,7 @@ def create_grid_rows():
 
 def empty_grid_indexes(grid: dict) -> dict:
     return [index for index, value in grid.items() if value == '.']
+
+def get_unique_board_set(associated_nodes):
+    associated_nodes.build_set()
+    return associated_nodes.return_unique_board_set()
