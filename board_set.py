@@ -1,25 +1,9 @@
-import pdb
 from string import ascii_letters
-
-def grid_values(grid: str) -> dict:
-    sudoku_board_dictionary = {}
-    grid_rows, grid_columns = create_grid_rows(), create_grid_columns()
-    grid_index = 0
-    for row in grid_rows:
-        for col in grid_columns:
-           sudoku_board_dictionary[row+str(col)] = grid[grid_index]
-           grid_index +=1
-    
-    return sudoku_board_dictionary
-
-def create_grid_columns():
-    return [i for i in range(1, 10)]
 
 def create_grid_rows():
     return [ascii_letters[ascii_letters.index('A') + i] for i in range(0, 9)]
 
-
-class BoardSet:
+class AssociatedNodes:
 
     ROW_START_DICT = {
         'A': 1,
@@ -65,7 +49,10 @@ class BoardSet:
             for j in range(col_start_pos, col_start_pos + 3):
                 current = chr(ord('@')+i) + str(j)
                 grid_list.append(current)
-        return grid_list 
+        return grid_list
+    
+    def return_unique_board_set(self):
+        return sorted(set(self.row_set + self.col_set + self.grid_set))
 
 
 
