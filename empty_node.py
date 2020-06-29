@@ -12,5 +12,5 @@ class EmptyNode:
         self.legal_positions = None
     
     def identify_filled_values(self):
-        for index in self.associated_indexes:
-            print(index, self.grid[index])
+        associated_values = [self.grid[i] for i in self.associated_indexes]
+        print(associated_values)
