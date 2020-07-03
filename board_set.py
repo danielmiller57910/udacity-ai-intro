@@ -37,7 +37,7 @@ class AssociatedNodes:
     
     def build_set(self):
         row_pos, col_pos = self.board_position[0], self.board_position[-1]
-        self.row_set = [f'{row_pos}{i}' for i in range (1, 10)]
+        self.row_set = [row_pos + str(i) for i in range (1, 10)]
         self.col_set = [f'{row}{col_pos}' for row in create_grid_rows()]
         self.grid_set = self._build_grid_set(row_pos, col_pos)
     
