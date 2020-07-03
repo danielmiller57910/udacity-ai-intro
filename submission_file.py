@@ -111,12 +111,43 @@ class NodeEliminator:
     def _remove_value(self, value_for_elimination, options_string):
         return options_string.replace(str(value_for_elimination), "")
         
+
+class NodeOnlyChoice:
+    def __init__(self, grid: dict) -> dict:
+        self.grid = grid
+        self.incomplete_nodes = self._find_incomplete_nodes()
+
+    def eliminate(self):
+        print("\n")
+        for i in self.incomplete_nodes:
+            current_index, current_value = i['index'], i['value']
+            for j in i["associated_nodes"]:
+                if len(self.grid[j]) == 1:
+                    impossible_value = str(self.grid[j])
+                    if impossible_value in current_value:
+                        current_value = current_value.replace(impossible_value, "")
+                    self.grid[current_index] = current_value
+        return self.grid
     
+    def _find_incomplete_nodes(self):
+        incomplete_nodes = []
+        for k, v in self.grid.items():
+            if len(v) > 1:
+                incomplete_nodes.append({
+                    "index": k, 
+                    "value": v, 
+                    "associated_nodes": get_unique_board_set(AssociatedNodes(k))
+               })
+        return incomplete_nodes
 
 
 def eliminate(grid: dict) -> dict:
     node_eliminator = NodeEliminator(grid)
     return node_eliminator.remove_completed_indexes_from_grid()
+
+def only_choice(grid: dict) -> dict:
+    only_choice = NodeOnlyChoice(grid)
+    return only_choice.eliminate()
 
 def grid_values(grid: str) -> dict:
     sudoku_board_dictionary = {}

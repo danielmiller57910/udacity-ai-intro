@@ -34,9 +34,11 @@ class TestDMUtils(unittest.TestCase):
     def test_grid_values(self):
         sudoku_board_dictionary = submission_file.grid_values(SAMPLE_GRID)
         eliminator = submission_file.NodeEliminator(sudoku_board_dictionary)
-        eliminator.remove_completed_indexes_from_grid()
-        for node in eliminator.completed_nodes:
-            for k in node['associated_nodes']:
-                print(f' {node["index"]}, {node["value"]}, {eliminator.grid[k]}')
-                print(str(node["value"]) == eliminator.grid[k])
+        sudoku_board_dictionary = eliminator.remove_completed_indexes_from_grid()
+        only_choice = submission_file.NodeOnlyChoice(sudoku_board_dictionary)
+        grid = only_choice.eliminate()
+        array_grid = []
 
+        grid_list_form = grid.values()
+        print(grid_list_form)
+      
