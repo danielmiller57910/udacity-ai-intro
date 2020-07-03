@@ -118,7 +118,6 @@ class NodeOnlyChoice:
         self.incomplete_nodes = self._find_incomplete_nodes()
 
     def eliminate(self):
-        print("\n")
         for i in self.incomplete_nodes:
             current_index, current_value = i['index'], i['value']
             for j in i["associated_nodes"]:
