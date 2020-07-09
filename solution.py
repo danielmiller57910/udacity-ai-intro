@@ -1,6 +1,10 @@
 from utils import *
 from string import ascii_letters
 from objects.associated_nodes import AssociatedNodes
+from objects.eliminate import NodeEliminator
+from objects.only_choice import NodeOnlyChoice
+from objects.empty_node import EmptyNode
+from objects.grid_values import grid_values
 import pdb
 import copy
 
@@ -43,98 +47,6 @@ def naked_twins(values):
     """
     # TODO: Implement this function!
     raise NotImplementedError
-
-
-from utils import *
-from string import ascii_letters
-import pdb
-import copy
-
-def create_grid_columns():
-    return [i for i in range(1, 10)]
-
-def create_grid_rows():
-    return [ascii_letters[ascii_letters.index('A') + i] for i in range(0, 9)]
-
-def empty_grid_indexes(grid: dict) -> dict:
-    return [index for index, value in grid.items() if value == '.']
-
-def get_unique_board_set(associated_nodes):
-    associated_nodes.build_set()
-    return associated_nodes.return_unique_board_set()
-
-
-
-class EmptyNode:
-    
-    ALLOWED_VALUES = [i for i in range(1, 10)]
-
-    def __init__(self, node: str, associated_indexes: list, grid: dict):
-        self.node = node
-        self.associated_indexes = associated_indexes
-        self.grid = grid
-        self.value_range = self._identify_filled_values()
-    
-    def _identify_filled_values(self):
-        associated_values = [self.grid[i] for i in self.associated_indexes]
-        return [int(val) for val in associated_values if val != '.']
-    
-    def get_value_range(self):
-        return ''.join([str(val) for val in self.ALLOWED_VALUES])
-
-class NodeEliminator:
-    def __init__(self, grid: dict) -> dict:
-        self.grid = grid
-        self.completed_nodes = self._find_completed_nodes()
-
-    def remove_completed_indexes_from_grid(self):
-        for node in self.completed_nodes:
-            value_for_elimination = node["value"]
-            for index in node["associated_nodes"]:
-                self.grid[index] = self._remove_value(value_for_elimination, self.grid[index])
-        return self.grid
-    
-    def _find_completed_nodes(self):
-        completed_nodes = []
-        for k, v in self.grid.items():
-            if len(v) == 1:
-                completed_nodes.append({
-                    "index": k, 
-                    "value": v, 
-                    "associated_nodes": get_unique_board_set(AssociatedNodes(k))
-               })
-        return completed_nodes
-    
-    def _remove_value(self, value_for_elimination, options_string):
-        return options_string.replace(str(value_for_elimination), "")
-        
-
-class NodeOnlyChoice:
-    def __init__(self, grid: dict) -> dict:
-        self.grid = grid
-        self.incomplete_nodes = self._find_incomplete_nodes()
-
-    def eliminate(self):
-        for i in self.incomplete_nodes:
-            current_index, current_value = i['index'], i['value']
-            for j in i["associated_nodes"]:
-                if len(self.grid[j]) == 1:
-                    impossible_value = str(self.grid[j])
-                    if impossible_value in current_value:
-                        current_value = current_value.replace(impossible_value, "")
-                    self.grid[current_index] = current_value
-        return self.grid
-    
-    def _find_incomplete_nodes(self):
-        incomplete_nodes = []
-        for k, v in self.grid.items():
-            if len(v) > 1:
-                incomplete_nodes.append({
-                    "index": k, 
-                    "value": v, 
-                    "associated_nodes": get_unique_board_set(AssociatedNodes(k))
-               })
-        return incomplete_nodes
 
 
 def eliminate(grid: dict) -> dict:
@@ -185,7 +97,8 @@ def search(values):
             return attempt
 
 def solve(values):
-    return search(values)
+    sudoku_grid = grid_values(values)
+    return search(sudoku_grid)
 
 if __name__ == "__main__":
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'

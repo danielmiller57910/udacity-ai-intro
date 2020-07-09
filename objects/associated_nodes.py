@@ -1,3 +1,10 @@
+from string import ascii_letters
+
+def create_grid_columns():
+    return [i for i in range(1, 10)]
+
+def create_grid_rows():
+    return [ascii_letters[ascii_letters.index('A') + i] for i in range(0, 9)]
 class AssociatedNodes:
 
     ROW_START_DICT = {
