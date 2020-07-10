@@ -11,44 +11,35 @@ import copy
 
 def naked_twins(values):
     """Eliminate values using the naked twins strategy.
+    Args:
+        values(dict): a dictionary of the form {'box_name': '123456789', ...}
 
-    The naked twins strategy says that if you have two or more unallocated boxes
-    in a unit and there are only two digits that can go in those two boxes, then
-    those two digits can be eliminated from the possible assignments of all other
-    boxes in the same unit.
-
-    Parameters
-    ----------
-    values(dict)
-        a dictionary of the form {'box_name': '123456789', ...}
-
-    Returns
-    -------
-    dict
-        The values dictionary with the naked twins eliminated from peers
-
-    Notes
-    -----
-    Your solution can either process all pairs of naked twins from the input once,
-    or it can continue processing pairs of naked twins until there are no such
-    pairs remaining -- the project assistant test suite will accept either
-    convention. However, it will not accept code that does not process all pairs
-    of naked twins from the original input. (For example, if you start processing
-    pairs of twins and eliminate another pair of twins before the second pair
-    is processed then your code will fail the PA test suite.)
-
-    The first convention is preferred for consistency with the other strategies,
-    and because it is simpler (since the reduce_puzzle function already calls this
-    strategy repeatedly).
-
-    See Also
-    --------
-    Pseudocode for this algorithm on github:
-    https://github.com/udacity/artificial-intelligence/blob/master/Projects/1_Sudoku/pseudocode.md
+    Returns:
+        the values dictionary with the naked twins eliminated from peers.
     """
-    # TODO: Implement this function!
-    raise NotImplementedError
 
+    # Find boxes with 2 entries
+    candidates = [box for box in values.keys() if len(values[box]) == 2]
+
+    # Collect boxes that have the same elements
+    twins = [[box1,box2] for box1 in candidates for box2 in peers[box1] if set(values[box1]) == set(values[box2])]
+
+    for b1,b2 in twins:
+        print(b1, b2, values[b1])
+
+    for box1, box2 in twins:
+
+        peers1 = set(peers[box1])
+        peers2 = set(peers[box2])
+
+        peers_int = peers1.intersection(peers2)
+
+        # delete the two digits from all common peers
+        for peer_box in peers_int:
+            for rm_val in values[box1]:
+                values = assign_value(values, peer_box, values[peer_box].replace(rm_val,''))
+
+    return values
 
 def eliminate(grid: dict) -> dict:
     node_eliminator = NodeEliminator(grid)
