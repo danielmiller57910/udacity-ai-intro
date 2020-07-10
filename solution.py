@@ -194,9 +194,7 @@ def find_unique_twins(possible_twins):
         if len(twin.values()) == 2:
             twin = {"node_1": list(twin.keys())[0], "node_2": list(twin.keys())[-1], "value": list(twin.values())[0]}
             actual_twins.append(twin)
-    
-    unique_twins = {x['node_1']:x for x in actual_twins}.values()
-    return unique_twins
+    return {x['node_1']:x for x in actual_twins}.values()
 
 def naked_twins(values):
     possible_twins = find_possible_twins(values.copy())
