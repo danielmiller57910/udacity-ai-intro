@@ -1,15 +1,210 @@
 from utils import *
 from string import ascii_letters
-from objects.associated_nodes import AssociatedNodes
-from objects.eliminate import NodeEliminator
-from objects.only_choice import NodeOnlyChoice
-from objects.empty_node import EmptyNode
-from objects.grid_values import grid_values
-from naked_queens import naked_queens
-import pdb
 import copy
+import pdb
+CHARACTER_LIST= "ABCDEFGHI"
+NUMBER_LIST = "123456789"
+
+def get_unique_board_set(associated_nodes):
+    associated_nodes.build_set()
+    return associated_nodes.return_unique_board_set()
+
+def empty_grid_indexes(grid: dict) -> dict:
+    return [index for index, value in grid.items() if value == '.']
+
+def grid_values(grid: str) -> dict:
+    sudoku_board_dictionary = {}
+    grid_rows, grid_columns = create_grid_rows(), create_grid_columns()
+    grid_index = 0
+    for row in grid_rows:
+        for col in grid_columns:
+           sudoku_board_dictionary[row+str(col)] = grid[grid_index]
+           grid_index +=1
+    
+    empty_indexes = empty_grid_indexes(sudoku_board_dictionary)
+    for index in empty_indexes:
+        empty_node = EmptyNode(
+            index,
+            get_unique_board_set(AssociatedNodes(index)), 
+            sudoku_board_dictionary
+        )
+        sudoku_board_dictionary[empty_node.node] = empty_node.get_value_range()
+    
+    return sudoku_board_dictionary
+
+def create_grid_columns():
+    return [i for i in range(1, 10)]
+
+def create_grid_rows():
+    return [ascii_letters[ascii_letters.index('A') + i] for i in range(0, 9)]
+
+def naked_queens():
+    top_list, bottom_list = get_top_and_bottom_list([], [])
+    return top_list, bottom_list
+
+def get_top_and_bottom_list(top_list, bottom_list):
+    for i in range(len(CHARACTER_LIST)):
+        top_list.append(CHARACTER_LIST[i] + NUMBER_LIST[i])
+
+    reversed_numbers = NUMBER_LIST[::-1]
+    for i in range(len(CHARACTER_LIST)):
+        bottom_list.append(CHARACTER_LIST[i] + reversed_numbers[i])
+    return top_list, bottom_list
+
+class NodeEliminator:
+    def __init__(self, grid: dict) -> dict:
+        self.grid = grid
+        self.completed_nodes = self._find_completed_nodes()
+
+    def remove_completed_indexes_from_grid(self):
+        for node in self.completed_nodes:
+            value_for_elimination = node["value"]
+            for index in node["associated_nodes"]:
+                self.grid[index] = self._remove_value(value_for_elimination, self.grid[index])
+        return self.grid
+    
+    def _find_completed_nodes(self):
+        completed_nodes = []
+        for k, v in self.grid.items():
+            if len(v) == 1:
+                completed_nodes.append({
+                    "index": k, 
+                    "value": v, 
+                    "associated_nodes": get_unique_board_set(AssociatedNodes(k))
+               })
+        return completed_nodes
+    
+    def _remove_value(self, value_for_elimination, options_string):
+        return options_string.replace(str(value_for_elimination), "")
+
+class NodeOnlyChoice:
+    def __init__(self, grid: dict) -> dict:
+        self.grid = grid
+        self.incomplete_nodes = self._find_incomplete_nodes()
+
+    def eliminate(self):
+        for i in self.incomplete_nodes:
+            current_index, current_value = i['index'], i['value']
+            for j in i["associated_nodes"]:
+                if len(self.grid[j]) == 1:
+                    impossible_value = str(self.grid[j])
+                    if impossible_value in current_value:
+                        current_value = current_value.replace(impossible_value, "")
+                    self.grid[current_index] = current_value
+        return self.grid
+    
+    def _find_incomplete_nodes(self):
+        incomplete_nodes = []
+        for k, v in self.grid.items():
+            if len(v) > 1:
+                incomplete_nodes.append({
+                    "index": k, 
+                    "value": v, 
+                    "associated_nodes": get_unique_board_set(AssociatedNodes(k))
+               })
+        return incomplete_nodes
+
+class AssociatedNodes:
+
+    ROW_START_DICT = {
+        'A': 1,
+        'B': 1,
+        'C': 1,
+        'D': 4,
+        'E': 4,
+        'F': 4,
+        'G': 7,
+        'H': 7,
+        'I': 7
+    }
+
+    COL_START_DICT = {
+        1: 1,
+        2: 1,
+        3: 1,
+        4: 4,
+        5: 4,
+        6: 4,
+        7: 7,
+        8: 7,
+        9: 7
+    }
+
+    LEFT_DIAGONAL_VALUES, RIGHT_DIAGONAL_VALUES = naked_queens()
+
+    def __init__(self, board_position: str):
+        self.board_position = board_position
+        self.row_set = []
+        self.col_set = []
+        self.grid_set = []
+        self.diagonal_set = []
+    
+    def build_set(self):
+        row_pos, col_pos = self.board_position[0], self.board_position[-1]
+        self.row_set = [row_pos + str(i) for i in range (1, 10)]
+        self.col_set = [row + col_pos for row in create_grid_rows()]
+        self.grid_set = self._build_grid_set(row_pos, col_pos)
+        if self.board_position in self.LEFT_DIAGONAL_VALUES:
+            self.diagonal_set.extend(self.LEFT_DIAGONAL_VALUES)
+        if self.board_position in self.RIGHT_DIAGONAL_VALUES:
+            self.diagonal_set.extend(self.RIGHT_DIAGONAL_VALUES)
+    
+    def _build_grid_set(self, row_pos, col_pos):
+
+        row_start_pos, col_start_pos = self.ROW_START_DICT[row_pos], self.COL_START_DICT[int(col_pos)]
+        grid_list = []
+        for i in range(row_start_pos, row_start_pos + 3):
+            for j in range(col_start_pos, col_start_pos + 3):
+                current = chr(ord('@')+i) + str(j)
+                grid_list.append(current)
+        return grid_list
+    
+    def return_unique_board_set(self):
+        unique_set = sorted(set(self.row_set + self.col_set + self.grid_set + self.diagonal_set))
+        return [el for el in unique_set if el != self.board_position]
+
+class EmptyNode:
+    
+    ALLOWED_VALUES = [i for i in range(1, 10)]
+
+    def __init__(self, node: str, associated_indexes: list, grid: dict):
+        self.node = node
+        self.associated_indexes = associated_indexes
+        self.grid = grid
+        self.value_range = self._identify_filled_values()
+    
+    def _identify_filled_values(self):
+        associated_values = [self.grid[i] for i in self.associated_indexes]
+        return [int(val) for val in associated_values if val != '.']
+    
+    def get_value_range(self):
+        return ''.join([str(val) for val in self.ALLOWED_VALUES if val not in self.value_range])
+
+def find_possible_twins(values):
+    possible_twins = {}
+    for k, v in values.items():
+        if len(v) == 2:
+            possible_twins[k] = v 
+    return possible_twins
 
 def naked_twins(values):
+    possible_twins = find_possible_twins(values.copy())
+    actual_twins = []
+    for k, v in possible_twins.items():
+        twin = dict(filter(lambda item: item[1] == v, possible_twins.items()))
+        if len(twin.values()) == 2:
+            twin = {"node_1": list(twin.keys())[0], "node_2": list(twin.keys())[-1], "value": list(twin.values())[0]}
+            actual_twins.append(twin)
+    
+    unique_twins = {x['node_1']:x for x in actual_twins}.values()
+    print(unique_twins)
+
+            
+    
+        
+    
+
+    
     """Eliminate values using the naked twins strategy.
     Args:
         values(dict): a dictionary of the form {'box_name': '123456789', ...}
@@ -18,28 +213,7 @@ def naked_twins(values):
         the values dictionary with the naked twins eliminated from peers.
     """
 
-    # Find boxes with 2 entries
-    candidates = [box for box in values.keys() if len(values[box]) == 2]
 
-    # Collect boxes that have the same elements
-    twins = [[box1,box2] for box1 in candidates for box2 in peers[box1] if set(values[box1]) == set(values[box2])]
-
-    for b1,b2 in twins:
-        print(b1, b2, values[b1])
-
-    for box1, box2 in twins:
-
-        peers1 = set(peers[box1])
-        peers2 = set(peers[box2])
-
-        peers_int = peers1.intersection(peers2)
-
-        # delete the two digits from all common peers
-        for peer_box in peers_int:
-            for rm_val in values[box1]:
-                values = assign_value(values, peer_box, values[peer_box].replace(rm_val,''))
-
-    return values
 
 def eliminate(grid: dict) -> dict:
     node_eliminator = NodeEliminator(grid)
@@ -54,8 +228,8 @@ def reduce_puzzle(values):
     while not stalled:
         # Check how many boxes have a determined value
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
-        values = eliminate(copy.deepcopy(values))
-        values = only_choice(copy.deepcopy(values))
+        values = eliminate(values)
+        values = only_choice(values)
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         stalled = solved_values_before == solved_values_after
         if len([box for box in values.keys() if len(values[box]) == 0]):
@@ -78,11 +252,8 @@ def pick(grid):
 
 def search(values):
     values = reduce_puzzle(values)
-    if values is False:
-        return False 
-    
-    if solved(values): 
-        return values
+    if values is False: return False 
+    if solved(values): return values
         
     current = pick(values)
     for value in values[current]:
@@ -101,7 +272,6 @@ if __name__ == "__main__":
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     display(result)
-
     try:
         import PySudoku
         PySudoku.play(grid2values(diag_sudoku_grid), result, history)

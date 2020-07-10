@@ -1,0 +1,16 @@
+{
+    "critiques": {
+        "689": {
+            "rubric_items": {
+                "5531": {
+                    "result": "passed",
+                    "observation": "Correct! (Note: this rubric item was graded automatically.)"
+                },
+                "5530": {
+                    "result": "failed",
+                    "observation": "  Your code completed 81 test cases. The last test case executed was:\n.5.721.8...78..3.........9..36.............4...8.........2.3.6...........2.......\n"
+                }
+            }
+        }
+    }
+}
