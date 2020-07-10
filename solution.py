@@ -187,8 +187,7 @@ def find_possible_twins(values):
             possible_twins[k] = v 
     return possible_twins
 
-def naked_twins(values):
-    possible_twins = find_possible_twins(values.copy())
+def find_unique_twins(possible_twins):
     actual_twins = []
     for k, v in possible_twins.items():
         twin = dict(filter(lambda item: item[1] == v, possible_twins.items()))
@@ -197,6 +196,11 @@ def naked_twins(values):
             actual_twins.append(twin)
     
     unique_twins = {x['node_1']:x for x in actual_twins}.values()
+    return unique_twins
+
+def naked_twins(values):
+    possible_twins = find_possible_twins(values.copy())
+    unique_twins = find_unique_twins(possible_twins)
     print(unique_twins)
 
             
