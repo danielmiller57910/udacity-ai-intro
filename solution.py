@@ -5,6 +5,7 @@ from objects.eliminate import NodeEliminator
 from objects.only_choice import NodeOnlyChoice
 from objects.empty_node import EmptyNode
 from objects.grid_values import grid_values
+from naked_queens import naked_queens
 import pdb
 import copy
 
@@ -71,10 +72,14 @@ def reduce_puzzle(values):
     return values
 
 def solved(values):
+    diagonal_values = [str(i) for i in range(1, 10)]
+    left_dag, right_dag = naked_queens()
     for k, v in values.items():
         if len(v) != 1:
             return False
-    return True
+    
+    left_diagonal_values, right_diagonal_values = [values[k] for k in left_dag], [values[j] for j in right_dag]
+    return sorted(left_diagonal_values) == diagonal_values and sorted(right_diagonal_values) == diagonal_values
 
 def pick(grid):
     possible_keys = [{"key": k, "value": v} for k, v in grid.items() if len(v) != 1]
