@@ -70,14 +70,30 @@ class TestNakedTwins(unittest.TestCase):
          'I3': '5', 'I4': '7', 'I5': '2', 'I6': '6', 'I7': '1', 'I8': '4', 'I9': '8'}
     ]
 
-    def test_naked_twins(self):
-        solution.naked_twins(self.before_naked_twins_1)
-        # self.assertTrue(solution.naked_twins(self.before_naked_twins_1) in self.possible_solutions_1, "Your naked_twins function produced an unexpected board.")
-
-    # def test_naked_twins2(self):
-    #     self.assertTrue(solution.naked_twins(self.before_naked_twins_1) in self.possible_solutions_1, "Your naked_twins function produced an unexpected board.")
-    #     self.assertTrue(solution.naked_twins(self.before_naked_twins_2) in self.possible_solutions_2, "Your naked_twins function produced an unexpected board.")
-
+    def test_find_possible_twins(self):
+        grid = {"A1": "124", "A2": "12", "B3": "12"}
+        twins = solution.find_possible_twins(grid)
+        self.assertTrue("A2" in twins.keys() and "B3" in twins.keys())
+        self.assertFalse("A1" in twins.keys())
+    
+    def test_find_unique_twins_in_grid(self):
+        grid = {"A1": "124", "A2": "12", "B3": "12"}
+        twins = solution.find_unique_twins(grid)
+        self.assertEqual(twins[0]['value'], '12')
+        self.assertTrue(twins[0]['node_1'] == 'A2' and twins[0]['node_2'] == 'B3')
+    
+    def test_shared_intersection(self):
+        grid = {"A1": "124", "A2": "12", "B3": "12"}
+        self.assertTrue(
+            solution.nodes_share_intersection(
+                "A1", "B3", solution.get_unique_board_set(solution.AssociatedNodes("A1"))
+            )
+        )
+        self.assertFalse(
+            solution.nodes_share_intersection(
+                "A1", "I7", solution.get_unique_board_set(solution.AssociatedNodes("A1"))
+            )
+        )
 
 
 class TestDiagonalSudoku(unittest.TestCase):

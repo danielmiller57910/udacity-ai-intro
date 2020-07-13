@@ -187,23 +187,24 @@ def find_possible_twins(values):
             possible_twins[k] = v 
     return possible_twins
 
-def find_unique_twins(possible_twins):
+def find_unique_twins(possible_twins: dict) -> list:
     actual_twins = []
     for k, v in possible_twins.items():
         twin = dict(filter(lambda item: item[1] == v, possible_twins.items()))
         if len(twin.values()) == 2:
             twin = {"node_1": list(twin.keys())[0], "node_2": list(twin.keys())[-1], "value": list(twin.values())[0]}
             actual_twins.append(twin)
-    return {x['node_1']:x for x in actual_twins}.values()
+    return list({x['node_1']:x for x in actual_twins}.values())
+
+def nodes_share_intersection(node_1: str, node_2: str, intersection: list):  
+    return node_2 in intersection
 
 def naked_twins(values):
     possible_twins = find_possible_twins(values.copy())
-    unique_twins = find_unique_twins(possible_twins)
-    print(unique_twins)
+    shared_values = find_unique_twins(possible_twins)
+    for value in shared_values:
+        nodes_share_intersection(value["node_1"],  value["node_2"], get_unique_board_set(AssociatedNodes(value['node_1'])))
 
-            
-    
-        
     
 
     
@@ -253,8 +254,10 @@ def pick(grid):
     return sorted(possible_keys, key=lambda i: len(i['value']))[0]['key']
 
 def search(values):
+
     values = reduce_puzzle(values)
     if values is False: return False 
+    
     if solved(values): return values
         
     current = pick(values)
@@ -269,16 +272,3 @@ def solve(values):
     sudoku_grid = grid_values(values)
     return search(sudoku_grid)
 
-if __name__ == "__main__":
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    display(grid2values(diag_sudoku_grid))
-    result = solve(diag_sudoku_grid)
-    display(result)
-    try:
-        import PySudoku
-        PySudoku.play(grid2values(diag_sudoku_grid), result, history)
-
-    except SystemExit:
-        pass
-    except:
-        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
