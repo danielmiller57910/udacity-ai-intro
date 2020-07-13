@@ -85,16 +85,18 @@ class TestNakedTwins(unittest.TestCase):
     def test_shared_intersection(self):
         grid = {"A1": "124", "A2": "12", "B3": "12"}
         self.assertTrue(
-            solution.nodes_share_intersection(
-                "A1", "B3", solution.get_unique_board_set(solution.AssociatedNodes("A1"))
-            )
+            solution.nodes_share_intersection({"node_1": "A1", "node_2": "B3"})
         )
         self.assertFalse(
-            solution.nodes_share_intersection(
-                "A1", "I7", solution.get_unique_board_set(solution.AssociatedNodes("A1"))
-            )
+            solution.nodes_share_intersection({"node_1": "A1", "node_2": "I7"})
         )
-
+    def test_naked_twins(self):
+        result = solution.naked_twins(self.before_naked_twins_1)
+        solved_first_peer = solution.get_unique_board_set(solution.AssociatedNodes("H4"))
+        solved_second_peer = solution.get_unique_board_set(solution.AssociatedNodes("H6"))
+        solved_peers = [i for i in solved_first_peer + solved_second_peer if i != "H6" and i != "H4"]
+        for i in solved_peers:
+            self.assertTrue("17" not in result[i])
 
 class TestDiagonalSudoku(unittest.TestCase):
     diagonal_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'

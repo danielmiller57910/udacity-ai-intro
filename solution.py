@@ -196,15 +196,26 @@ def find_unique_twins(possible_twins: dict) -> list:
             actual_twins.append(twin)
     return list({x['node_1']:x for x in actual_twins}.values())
 
-def nodes_share_intersection(node_1: str, node_2: str, intersection: list):  
-    return node_2 in intersection
+def nodes_share_intersection(node_set):  
+   return node_set['node_2'] in get_unique_board_set(AssociatedNodes(node_set['node_1']))
 
-def naked_twins(values):
+def identify_associated_nodes(node_set):
+    grid_intersection = get_unique_board_set(AssociatedNodes(node_set['node_1'])) + get_unique_board_set(AssociatedNodes(node_set['node_2']))
+    node_set['grid_intersection'] = set([i for i in grid_intersection if i != node_set['node_1'] and i != node_set['node_2']])
+    return node_set
+
+def naked_twins(values: dict) -> dict:
     possible_twins = find_possible_twins(values.copy())
     shared_values = find_unique_twins(possible_twins)
-    for value in shared_values:
-        nodes_share_intersection(value["node_1"],  value["node_2"], get_unique_board_set(AssociatedNodes(value['node_1'])))
-
+    peers = filter(nodes_share_intersection, shared_values)
+    peers = map(identify_associated_nodes, peers)
+    for peer in peers:
+        print(peer)
+        value = peer['value']
+        for intersection in peer['grid_intersection']:
+            values[intersection] = values[intersection].replace(value, "")
+    
+    return values
     
 
     
